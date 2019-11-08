@@ -195,17 +195,24 @@ namespace PageComponents
             return $"Element '{_by}'";
         }
 
+        public IWebElement WaitForMe()
+        {
+            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
+            wait.Message = $"{this} was not found";
+            wait.Until(driver => !FindMe().IsStale());
+            _webelement.Highlight();
+            return _webelement;
+        }
+
         /// <summary>
-        /// FindMe() selects the iframe, and waits for the element to appear.  Once found the IWebElement
+        /// FindMe() selects the iframe, and searches for the element.  Once found the IWebElement
         /// is stored in the WrappedElement for future use
         /// Waits an amount of time specified by the timeoutMs value.
         /// </summary>
         /// <returns></returns>
         public IWebElement FindMe()
         {
-            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
-            wait.Message = $"{this} was not found";
-
+     
             //wait for all ajax requests to finish
             WrappedDriver.WaitForAjax(_timeoutMs);
 
@@ -227,15 +234,13 @@ namespace PageComponents
                     //if FindHidden is false, only find visible elements
                     if (!FindHidden)
                     {
-                        _webelement = wait.Until(drv => root.FindVisibleElement(_by));
+                        _webelement =root.FindVisibleElement(_by);
                     }
                     else
                     {
                         //find any element, even if its hidden
-                        _webelement = wait.Until(drv => root.FindElement(_by));
+                        _webelement = root.FindElement(_by);
                     }
-                    
-
                 }
                 else
                 {
@@ -247,29 +252,23 @@ namespace PageComponents
                     //find hidden elements if appropriate
                     if (!FindHidden)
                     {
-                        _webelement = wait.Until(drv => drv.FindVisibleElement(_by));
+                        _webelement = WrappedDriver.FindVisibleElement(_by);
                     }
                     //find any element including hidden ones
                     else
                     {
-                        _webelement = wait.Until(drv => drv.FindElement(_by));
+                        _webelement = WrappedDriver.FindElement(_by);
                     }
                     
 
                 }
             }
             //highlight the element so the user can see what element was found
-            _webelement.Highlight();
+            //_webelement.Highlight();
             return _webelement;
         }
 
 
-        public IWebElement WaitForMe()
-        {
-            WebDriverWait wait = new WebDriverWait(this.WrappedDriver,TimeSpan.FromMilliseconds(timeoutMs));
-            wait.Until(x => FindMe().Displayed);
-            return WrappedElement;
-        }
         /// <summary>
         /// checks to see if the element is stale or hasn't been found yet
         /// </summary>
@@ -290,37 +289,37 @@ namespace PageComponents
         }
 
         public string TagName {
-            get { return FindMe().TagName; }    
+            get { return WaitForMe().TagName; }    
         }
 
         public string Text
         {
-            get { return FindMe().Text; }
+            get { return WaitForMe().Text; }
         }
 
         public bool Enabled
         {
-            get { return FindMe().Enabled; }
+            get { return WaitForMe().Enabled; }
         }
 
         public bool Selected
         {
-            get { return FindMe().Selected; }
+            get { return WaitForMe().Selected; }
         }
 
         public Point Location
         {
-            get { return FindMe().Location; }
+            get { return WaitForMe().Location; }
         }
 
         public Size Size
         {
-            get { return FindMe().Size; }
+            get { return WaitForMe().Size; }
         }
 
         public bool Displayed
         {
-            get { return Present && FindMe().Displayed;  }
+            get { return Present && WaitForMe().Displayed;  }
         }
 
         public bool Present
@@ -342,21 +341,21 @@ namespace PageComponents
         public Element Clear()
         {
             test.Info($"Clearing {this}");
-            FindMe().Clear();
+            WaitForMe().Clear();
            return this;
         }
 
         public Element Click()
         {
             test.Info($"Clicking {this}");
-            FindMe().Click();
+            WaitForMe().Click();
             return this;
         }
 
         public Element Hover()
         {
             test.Info($"Mouse Hover over {this}");
-            Actions().MoveToElement(FindMe()).Build().Perform();
+            Actions().MoveToElement(WaitForMe()).Build().Perform();
             return this;
         }
 
@@ -368,35 +367,35 @@ namespace PageComponents
         public IWebElement FindElement(By by)
         {
             test.Info($"Finding child of {this} with '{by}'");
-            return FindMe().FindElement(by);
+            return WaitForMe().FindElement(by);
         }
 
         public ReadOnlyCollection<IWebElement> FindElements(By by)
         {
             test.Info($"Finding children of {this} with '{by}'");
-            return FindMe().FindElements(by);
+            return WaitForMe().FindElements(by);
         }
 
         public string GetAttribute(string attributeName)
         {
-            return FindMe().GetAttribute(attributeName);
+            return WaitForMe().GetAttribute(attributeName);
         }
 
         public string GetCssValue(string propertyName)
         {
-            return FindMe().GetCssValue(propertyName);
+            return WaitForMe().GetCssValue(propertyName);
         }
 
         public string GetProperty(string propertyName)
         {
-            return FindMe().GetProperty(propertyName);
+            return WaitForMe().GetProperty(propertyName);
         }
 
         public Element SendKeys(string text)
         {
             test.Info($"Sending keys '{text}' into {this}");
 
-            FindMe().SendKeys(text);
+            WaitForMe().SendKeys(text);
             return this;
         }
 
@@ -404,15 +403,15 @@ namespace PageComponents
         {
             test.Info($"Submitting {this}");
 
-            FindMe().Submit();
+            WaitForMe().Submit();
             return this;
         }
 
         public Element SetText(string value)
         {
             test.Info($"Setting {this} text to {value}");
-            FindMe().Clear();
-            FindMe().SendKeys(value);
+            WaitForMe().Clear();
+            WaitForMe().SendKeys(value);
             return this;
 
         }
@@ -444,7 +443,7 @@ namespace PageComponents
         /// <returns></returns>
         public SelectElement Select()
         {
-            FindMe();
+            WaitForMe();
             return new SelectElement(WrappedElement);
         }
 

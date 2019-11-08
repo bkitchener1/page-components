@@ -152,8 +152,21 @@ namespace PageComponents
         /// <returns></returns>
         public static IWebElement FilterVisibleElement (this IEnumerable<IWebElement> elements)
         {
-            var eles = elements.Where(x => x.Displayed);
-            return eles.FirstOrDefault();
+            var ele = elements.Where(x => x.Displayed);
+            return ele != null ? ele.First() : elements.First();
+        }
+
+        public static bool IsStale(this IWebElement element)
+        {
+            try
+            {
+                var enabled = element.Enabled;
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
     }

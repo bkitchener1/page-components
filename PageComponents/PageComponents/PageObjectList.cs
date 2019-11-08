@@ -61,6 +61,8 @@ namespace PageComponents
             /// <returns></returns>
             public IEnumerator<T> GetEnumerator()
             {
+
+
                 foreach (var ele in this.containers)
                 {
                     var el = Activator.CreateInstance<T>();
