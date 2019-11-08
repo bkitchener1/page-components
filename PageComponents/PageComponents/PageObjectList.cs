@@ -40,12 +40,17 @@ namespace PageComponents
                 this.containers = new Elements(by);
             }
 
-            /// <summary>
-            /// Create a page object list using an iframe and a locator
-            /// </summary>
-            /// <param name="frame"></param>
-            /// <param name="by"></param>
-            public PageObjectList(Frame frame, By by)
+            public PageObjectList(string cssSelector)
+            {
+                this.containers = new Elements(By.CssSelector(cssSelector));
+            }
+
+        /// <summary>
+        /// Create a page object list using an iframe and a locator
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="by"></param>
+        public PageObjectList(Frame frame, By by)
             {
                 this.containers = new Elements(frame, by);
             }

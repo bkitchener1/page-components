@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace PageComponents
 {
@@ -18,16 +19,16 @@ namespace PageComponents
     /// </summary>
     public static class DriverManager
     {
-        private static IDictionary<string, IWebDriver> _webDrivers;
+        private static ThreadLocal<IWebDriver> _webDrivers = new ThreadLocal<IWebDriver>();
 
         /// <summary>
         /// The list of webdriver instances currently stored.  Each Test has it's own instance of webdriver.
         /// This supports parallel executions of tests and multiple instances of webdriver
         /// If additional instances are needed for a test they must bne added manually
         /// </summary>
-        public static IDictionary<string, IWebDriver> WebDrivers
+        public static ThreadLocal<IWebDriver> WebDrivers
         {
-            get { return _webDrivers ?? (_webDrivers = new Dictionary<string, IWebDriver>()); }
+            get { return _webDrivers; }
             set { _webDrivers = value; }
         }
 
@@ -59,7 +60,7 @@ namespace PageComponents
             {
                 testName = TestContext.CurrentContext.Test.Name;
             }
-            WebDrivers[testName] = driver;
+            WebDrivers.Value = driver;
             return driver;
 
         }
@@ -153,19 +154,20 @@ namespace PageComponents
             return driver;
         }
 
+        private static object locker = new object();
+
         /// <summary>
         /// Gets the current instance of webdriver based upon the current test name.
         /// IF a new browser is needed use StartDriver() instead
         /// </summary>
         /// <returns></returns>
-        public static IWebDriver GetDriver(string testName="")
+        public static IWebDriver GetDriver()
         {
-            if (testName == "") testName = TestContext.CurrentContext.Test.Name;
-            if (!WebDrivers.ContainsKey(testName))
+            lock (locker)
             {
-                throw new Exception($"Could not find WebDriver instance for test {testName}");
+                return WebDrivers.Value;
             }
-            return WebDrivers[testName];
+            
         }
 
         private static string GetDriverPath(string browserName)
@@ -206,10 +208,10 @@ namespace PageComponents
         }
         public static void CloseAllDrivers()
         {
-            foreach (var driver in _webDrivers)
+            foreach (var driver in WebDrivers.Values)
             {
-                driver.Value.Close();
-                driver.Value.Quit();
+                driver.Close();
+                driver.Quit();
             }
         }
     }

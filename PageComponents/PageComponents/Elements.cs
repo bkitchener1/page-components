@@ -173,7 +173,7 @@ namespace PageComponents
             _elements = new List<Element>();
             foreach (var webele in _webElements)
             {
-                //webele.Highlight();
+                webele.Highlight();
                 var elem = new Element(by);
                 elem.WrappedElement = webele;
                 _elements.Add(elem);

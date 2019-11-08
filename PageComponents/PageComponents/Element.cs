@@ -102,11 +102,22 @@ namespace PageComponents
             set { _findHidden = value; }
         }
 
-        /// <summary>
-        /// Instantiates an element without a by locator 
-        /// </summary>
+//        /// <summary>
+//        /// Instantiates an element without a by locator 
+//        /// </summary>
         public Element()
         {
+            this._timeoutMs = WebConfig.ElementTimeoutMs;
+        }
+
+        /// <summary>
+        /// Instntiate an Element using a css selector and the default timeout
+        /// </summary>
+        /// <param name="by"></param>
+        public Element(string cssSelector)
+        {
+
+            this._by = By.CssSelector(cssSelector);
             this._timeoutMs = WebConfig.ElementTimeoutMs;
         }
 
@@ -148,6 +159,19 @@ namespace PageComponents
         }
 
         /// <summary>
+        /// Instntiates an Element using a root container, and a css locator.
+        /// The Element will only search in descendents of the root container
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="by"></param>
+        public Element(Element container, string cssSelector)
+        {
+            this._container = container;
+            this._by = By.CssSelector(cssSelector);
+            this._timeoutMs = WebConfig.ElementTimeoutMs;
+        }
+
+        /// <summary>
         /// Instntiates an Element using a root container, an iframe, and a by locator.
         /// The container will be found first, then the iframe selected, then the element found
         /// </summary>
@@ -173,7 +197,7 @@ namespace PageComponents
 
         /// <summary>
         /// FindMe() selects the iframe, and waits for the element to appear.  Once found the IWebElement
-        /// is storedin the WrappedElement for future use
+        /// is stored in the WrappedElement for future use
         /// Waits an amount of time specified by the timeoutMs value.
         /// </summary>
         /// <returns></returns>
@@ -235,10 +259,17 @@ namespace PageComponents
                 }
             }
             //highlight the element so the user can see what element was found
-            //_webelement.Highlight();
+            _webelement.Highlight();
             return _webelement;
         }
 
+
+        public IWebElement WaitForMe()
+        {
+            WebDriverWait wait = new WebDriverWait(this.WrappedDriver,TimeSpan.FromMilliseconds(timeoutMs));
+            wait.Until(x => FindMe().Displayed);
+            return WrappedElement;
+        }
         /// <summary>
         /// checks to see if the element is stale or hasn't been found yet
         /// </summary>

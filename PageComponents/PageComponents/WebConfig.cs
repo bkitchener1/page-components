@@ -16,8 +16,8 @@ namespace PageComponents
         public static int ElementTimeoutMs = GetConfigInt("ElementTimeoutMs", 10000);
         public static bool AutoLaunchBrowser = GetConfigBool("AutoLaunchBrowser", true);
         public static bool AutoQuitBrowser = GetConfigBool("AutoQuitBrowser", true);
-        public static string DefaultUrl = GetConfigString("DefaultUrl", "http://rposwebdev2/");
-        public static string BrowserName = GetConfigString("BrowserName", "ie");
+        public static string DefaultUrl = GetConfigString("DefaultUrl", "");
+        public static string BrowserName = GetConfigString("BrowserName", "chrome");
         public static bool RemoteSession = GetConfigBool("RemoteSession", false);
         public static string RemoteServer = GetConfigString("RemoteServer", "http://127.0.0.1:4444");
         public static string RemoteCapabilities = GetConfigString("RemoteCapabilities", "");
