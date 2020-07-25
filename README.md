@@ -38,6 +38,26 @@ public class LoginPage : PageComponent{
     SignInButton.Click();
     return new HomePage();
   }
+  
+  public LoginPage AssertNoErrors(){
+    ErrorMessages.Verify().Count(0);
+  }
 }
 ```
 
+### Creating Components
+Smaller reusable components can be built using the same base PageComponent abstract class, and can be included as part of a larger page object
+```cs
+public class HeaderComponent : PageComponent {
+  public Element LogOutLink => new Element(this, By.CssSelector(".logout"));
+  
+  public LoginPage LogOut() {
+    LogOutLink.Click();
+    return new LoginPage();
+  }
+}
+
+public class HomePage : PageComponent {
+   public Header = new HeaderComponent(By.CssSelector(".header"));
+}
+```
