@@ -1,13 +1,14 @@
 using NUnit.Framework;
+using OpenQA.Selenium.Chrome;
 using PageComponents;
+using System;
 
 namespace SampleTests
 {
-    public class GoogleSearchTests : WebTestBase
+    public class ExtentTest : ExtentTestBase
     {
-
         [Test]
-        public void Test1()
+        public void Test()
         {
             GoogleHomePage.OpenPage<GoogleHomePage>().SearchFor("selenium").ClickLinkWithText("Selenium automates browsers. That's it! What you do with that power is entirely up to you.");
         }

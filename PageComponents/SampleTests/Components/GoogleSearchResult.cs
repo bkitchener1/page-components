@@ -5,11 +5,11 @@ using PageComponents;
 
 namespace SampleTests.Components
 {
-    class GoogleSearchResult : BasePageObject
+    class GoogleSearchResult : BaseComponent
     {
-        public Element ResultLink => new Element(this, "a>div");
-        public Element ResultText => new Element(this, ".st");
-        public Element ResultTitle => new Element(this, "a>h3");
+        public Element ResultLink => this.Element("a>div");
+        public Element ResultText => this.Element(".st");
+        public Element ResultTitle => this.Element("a>h3");
 
     }
 }

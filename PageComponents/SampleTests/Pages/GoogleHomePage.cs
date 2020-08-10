@@ -5,8 +5,8 @@ namespace SampleTests
 {
     class GoogleHomePage : BasePageObject
     {
-        public Element SearchField = new Element(("input[name=q]"));
-        public Element SearchButton = new Element(("input[name=btnK]"));
+        public Element SearchField = new Element("input[name=q]");
+        public Element SearchButton = new Element("input[name=btnK]");
 
         public GoogleHomePage()
         {

@@ -6,8 +6,7 @@ namespace SampleTests.Pages
 {
     class GoogleSearchResultsPage : BasePageObject
     {
-        public PageObjectList<GoogleSearchResult> SearchResults = new PageObjectList<GoogleSearchResult>(".srg .g");
-
+        public PageComponentList<GoogleSearchResult> SearchResults = new PageComponentList<GoogleSearchResult>(".g");
 
         public void ClickLinkWithText(string searchText)
         {
