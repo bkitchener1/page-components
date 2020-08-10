@@ -11,3 +11,7 @@
      steps:
        - checkout
        - run: dotnet build
+    test:
+      executor: win/default
+      steps:
+        nunit3-console PageComponentUnitTests\bin\Debug\PageComponentUnitTests.dll
