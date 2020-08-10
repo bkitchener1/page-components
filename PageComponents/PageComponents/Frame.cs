@@ -17,5 +17,28 @@ namespace PageComponents
         {
 
         }
+        public Frame(string cssSelector) : base(cssSelector)
+        {
+
+        }
+
+        /// <summary>
+        /// Overrides the ToString() function to make a nice loggable message
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            if (_container != null)
+            {
+                return $"Frame '{_by}' with parent '{_container}'";
+            }
+            if (Index != 0)
+            {
+                //Want the log to be clear that this comes from a list
+                return $"Frame '{_by}' [{Index + 1}]";
+
+            }
+            return $"Frame '{_by}'";
+        }
     }
 }

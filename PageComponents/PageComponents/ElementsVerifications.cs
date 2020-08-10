@@ -48,14 +48,14 @@ namespace PageComponents
         public Elements Count(int num)
         {
             _wait.Message = $"Count of {_elements} expected '{num}' {GetCondition()} equal to actual '{_elements.Count()}'";
-            _wait.Until(x => _elements.Count() == num);
+            _wait.Until(x => _elements.Count() == num == _isTrue);
             return _elements;
         }
 
         public Elements CountGreaterThan(int num)
         {
             _wait.Message = $"Count of {_elements} expected '{num}' {GetCondition()} greater than actual '{_elements.Count()}'";
-            _wait.Until(x => _elements.Count() > num);
+            _wait.Until(x => _elements.Count() > num == _isTrue);
             return _elements;
         }
 
@@ -68,7 +68,7 @@ namespace PageComponents
         public Elements IsPresent()
         {
             _wait.Message = $"{_elements} {GetCondition()} found";
-            _wait.Until(x => _elements.Count() > 0);
+            _wait.Until(x => _elements.Count() > 0 == _isTrue);
             return _elements;
         }
 

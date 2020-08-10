@@ -44,6 +44,56 @@ namespace PageComponentUnitTests
             Assert.AreEqual(0, DeleteButtons.Count());
         }
 
+        [Test]
+        public void TestElementsAssertCount()
+        {
+            AddElementButton.Click();
+            AddElementButton.Click();
+            AddElementButton.Click();
+            DeleteButtons.Verify().Count(3);
+        }
+
+
+        [Test]
+        public void TestElementsAssertCountGreaterThan()
+        {
+            AddElementButton.Click();
+            AddElementButton.Click();
+            AddElementButton.Click();
+            DeleteButtons.Verify().CountGreaterThan(2);
+        }
+
+        [Test]
+        public void TestElementsAssertCountNotGreaterThan()
+        {
+            AddElementButton.Click();
+            AddElementButton.Click();
+            AddElementButton.Click();
+            DeleteButtons.VerifyNot().CountGreaterThan(4);
+        }
+
+        [Test]
+        public void TestElementsAssertCountNot()
+        {
+            AddElementButton.Click();
+            AddElementButton.Click();
+            AddElementButton.Click();
+            DeleteButtons.VerifyNot().Count(2);
+        }
+
+        [Test]
+        public void TestElementsIsPresent()
+        {
+            AddElementButton.Click();
+            DeleteButtons.Verify().IsPresent();
+        }
+
+        [Test]
+        public void TestElementsIsNotPresent()
+        {
+            DeleteButtons.VerifyNot().IsPresent();
+        }
+
 
     }
 }

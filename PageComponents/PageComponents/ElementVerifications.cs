@@ -23,7 +23,7 @@ namespace PageComponents
         public ElementVerifications(Element element)
         {
             this._element = element;
-            _timeoutMs = element.timeoutMs;
+            _timeoutMs = element.TimeoutMs;
             _isTrue = true;
             _wait = new WebDriverWait(_element.WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
         }
@@ -32,7 +32,7 @@ namespace PageComponents
         {
             this._element = element;
             this._isTrue = isTrue;
-            _timeoutMs = element.timeoutMs;
+            _timeoutMs = element.TimeoutMs;
             _wait = new WebDriverWait(_element.WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
 
         }

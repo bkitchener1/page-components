@@ -7,6 +7,7 @@ using AventStack.ExtentReports.Reporter;
 using AventStack.ExtentReports;
 using NUnit.Framework.Interfaces;
 using OpenQA.Selenium.Support.Extensions;
+using NUnit.Framework.Internal;
 
 namespace PageComponents
 {
@@ -17,31 +18,28 @@ namespace PageComponents
     /// </summary>
     public abstract class WebTestBase
     {
-        protected IWebDriver driver;
+        protected IWebDriver driver
+        {
+            get
+            {
+                return DriverManager.WebDriver;
+            }
+            set
+            {
+                DriverManager.WebDrivers.Value = value;
+            }
+        }
         #region Test attributes
 
-        private ExtentTest test => ExtentManager.GetTest();
-
-
-        [OneTimeTearDown]
-        public void TeardownAll()
-        {
-            //calling flush generates the report 
-            ExtentManager.Flush();
-           // DriverManager.CloseAllDrivers();
-        }
-
-      
         //Use TestInitialize to run code before running each test 
         [SetUp]
         public void Setup()
         {
             // creates a test 
-            ExtentManager.CreateTest(this.GetType().Name + "." + TestContext.CurrentContext.Test.Name, TestContext.CurrentContext.Test.FullName);
             // calling flush writes everything to the log file
             if (WebConfig.AutoLaunchBrowser)
             {
-                driver = DriverManager.StartDriver();
+                DriverManager.StartDriver();
                 driver.Manage().Window.Maximize();
             }
         }
@@ -52,15 +50,11 @@ namespace PageComponents
         {
             try
             {
-                if (TestContext.CurrentContext.Result.Outcome != ResultState.Success)
+                if(TestContext.CurrentContext.Result.Outcome != ResultState.Success)
                 {
-                    test.Fail(TestContext.CurrentContext.Result.Message,
-                        MediaEntityBuilder
-                            .CreateScreenCaptureFromBase64String(driver.TakeScreenshot().AsBase64EncodedString)
-                            .Build());
-                    test.Error(TestContext.CurrentContext.Result.StackTrace);
+                    Logger.Error(TestContext.CurrentContext.Result.Message);
+                    Logger.Error(TestContext.CurrentContext.Result.StackTrace);
                 }
-
                 if (WebConfig.AutoQuitBrowser)
                 {
                     driver.Close();
@@ -69,7 +63,7 @@ namespace PageComponents
             }
             catch (Exception e)
             {
-                test.Fatal(e);
+                Logger.Error(e.ToString());
             }          
         }
 

@@ -56,7 +56,7 @@ namespace PageComponents
 
         public IWebDriver WrappedDriver
         {
-            get { return _driver != null ? _driver : DriverManager.GetDriver(); }
+            get { return _driver != null ? _driver : DriverManager.WebDriver; }
             set { _driver = value; }
         }
 
@@ -71,36 +71,46 @@ namespace PageComponents
             this._timeoutMs = WebConfig.ElementTimeoutMs;
         }
 
-        public Elements(By by)
+        public Elements(string cssSelector, int timeoutMs = -1)
         {
-            this._by = by;
-            this._timeoutMs = WebConfig.ElementTimeoutMs;
+            this._by = By.CssSelector(cssSelector);
+            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
         }
 
-        public Elements(Frame frame, By by)
+        public Elements(By by, int timeoutMs = -1)
+        {
+            this._by = by;
+            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+        }
+
+        public Elements(By by, Frame frame, int timeoutMs = -1)
         {
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = WebConfig.ElementTimeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
         }
 
-        public Elements(Element container, By by)
+        public Elements(Element container, By by, int timeoutMs = -1)
         {
             this._container = container;
             this._by = by;
-            this._timeoutMs = WebConfig.ElementTimeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
         }
 
-        public Elements(Element container, Frame frame, By by)
+        public Elements(Element container, By by, Frame frame, int timeoutMs = -1)
         {
             this._container = container;
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = WebConfig.ElementTimeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public override string ToString()
         {
+            if (_container != null)
+            {
+                return $"Elements '{_by}' with container '{_container}'";
+            }
             return $"Elements '{_by}'";
         }
 
@@ -124,10 +134,8 @@ namespace PageComponents
             }
         }
 
-        public IEnumerable<IWebElement> FindMe()
+        private IEnumerable<IWebElement> FindMe()
         {
-            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
-            wait.Message = $"{this} was not found";
             WrappedDriver.WaitForAjax(_timeoutMs);
             if (IsStale())
             {
@@ -136,16 +144,19 @@ namespace PageComponents
                     var root = _container.FindMe();
                     if (_frame != null)
                     {
+                        Logger.Log($"Select frame {_frame}");
                         WrappedDriver.SwitchTo().Frame(_frame.FindMe());
                     }
 
                     if (FindHidden)
                     {
-                        _webElements = wait.Until(drv => root.FindElements(_by));
+                        Logger.Log($"Find {this}");
+                        _webElements =  root.FindElements(_by);
                     }
                     else
                     {
-                        _webElements = wait.Until(drv => root.FindVisibleElements(_by));
+                        Logger.Log($"Find visible {this}");
+                        _webElements = root.FindVisibleElements(_by);
                     }
 
 
@@ -154,30 +165,46 @@ namespace PageComponents
                 {
                     if (_frame != null)
                     {
+                        Logger.Log($"Select frame {_frame}");
                         WrappedDriver.SwitchTo().Frame(_frame.FindMe());
                     }
 
                     if (FindHidden)
                     {
-                        _webElements = wait.Until(_driver => _driver.FindElements(_by));
+                        Logger.Log($"Find {this}");
+                        _webElements = WrappedDriver.FindElements(_by);
 
                     }
                     else
                     {
-                        _webElements = wait.Until(_driver => _driver.FindVisibleElements(_by));
+                        Logger.Log($"Find visible {this}");
+                        _webElements = WrappedDriver.FindVisibleElements(_by);
                     }
 
                 }
             }
 
+
+             Logger.Log($"Found {_webElements.Count()} Elements {_by}");
+
             _elements = new List<Element>();
+            int i = 1;
             foreach (var webele in _webElements)
             {
-                webele.Highlight();
-                var elem = new Element(by);
+                webele.Highlight(30,"red");
+                var elem = new Element(webele, by, i);
                 elem.WrappedElement = webele;
                 _elements.Add(elem);
+                i++;
             }
+            return _webElements;
+        }
+
+        public IEnumerable<IWebElement> WaitForMe()
+        {
+            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
+            wait.Message = $"{this} was not found";
+            wait.Until(drv => FindMe().Count() > 0);
             return _webElements;
         }
 

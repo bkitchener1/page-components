@@ -94,6 +94,10 @@ namespace PageComponents
         public static IEnumerable<IWebElement> FindVisibleElements(this IWebElement element, By by)
         {
             var eles = element.FindElements(by);
+            if (eles.Count() == 0)
+            {
+                return new List<IWebElement>();
+            }
             return eles.FilterVisibleElements();
         }
 
@@ -106,6 +110,10 @@ namespace PageComponents
         public static IWebElement FindVisibleElement(this IWebElement element, By by)
         {
             var eles = element.FindElements(by);
+            if(eles.Count() == 0)
+            {
+                return null;
+            }
             return eles.FilterVisibleElement();
         }
 
@@ -118,6 +126,10 @@ namespace PageComponents
         public static IEnumerable<IWebElement> FindVisibleElements(this IWebDriver driver, By by)
         {
             var eles = driver.FindElements(by);
+            if (eles.Count() == 0)
+            {
+                return new List<IWebElement>();
+            }
             return eles.FilterVisibleElements();
         }
 
@@ -130,6 +142,10 @@ namespace PageComponents
         public static IWebElement FindVisibleElement(this IWebDriver driver, By by)
         {
             var eles = driver.FindElements(by);
+            if (eles.Count() == 0)
+            {
+                return null;
+            }
             return eles.FilterVisibleElement();
         }
 
@@ -150,16 +166,20 @@ namespace PageComponents
         /// </summary>
         /// <param name="elements"></param>
         /// <returns></returns>
-        public static IWebElement FilterVisibleElement (this IEnumerable<IWebElement> elements)
+        public static IWebElement FilterVisibleElement(this IEnumerable<IWebElement> elements)
         {
             var ele = elements.Where(x => x.Displayed);
-            return ele != null ? ele.First() : elements.First();
+            return ele != null && ele.Count() > 0 ? ele.First() : elements.First();
         }
 
         public static bool IsStale(this IWebElement element)
         {
             try
             {
+                if(element == null)
+                {
+                    return true;
+                }
                 var enabled = element.Enabled;
                 return false;
             }

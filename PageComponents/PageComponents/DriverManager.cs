@@ -32,6 +32,18 @@ namespace PageComponents
             set { _webDrivers = value; }
         }
 
+        public static IWebDriver WebDriver
+        {
+            get
+            {
+                return WebDrivers.Value;
+            }
+            set
+            {
+                WebDrivers.Value = value;
+            }
+        }
+
         /// <summary>
         /// Starts a new webdriver browser based upon the setting stored in the app.config,
         /// and stores it based upon the testname passed into the function.
@@ -172,38 +184,48 @@ namespace PageComponents
 
         private static string GetDriverPath(string browserName)
         {
-            string fileName = null;
-            switch (browserName)
+            try
             {
-                case WebBrowsers.InternetExplorer:
-                    fileName = "IEDriverServer.exe";
-                    break;
-                case WebBrowsers.Firefox:
-                    fileName = "GeckoDriver.exe";
-                    break;
-                case WebBrowsers.Chrome:
-                    fileName = "ChromeDriver.exe";
-                    break;
-                default:
-                    throw new Exception("Browser not supported : " + browserName);
-                    break;
+                string fileName = null;
+                switch (browserName)
+                {
+                    case WebBrowsers.InternetExplorer:
+                        fileName = "IEDriverServer.exe";
+                        break;
+                    case WebBrowsers.Firefox:
+                        fileName = "GeckoDriver.exe";
+                        break;
+                    case WebBrowsers.Chrome:
+                        fileName = "ChromeDriver.exe";
+                        break;
+                    default:
+                        throw new Exception("Browser not supported : " + browserName);
+                        break;
+                }
+                var dir = AppDomain.CurrentDomain.BaseDirectory;
+                if (File.Exists(Path.Combine(dir, fileName)))
+                {
+                    return dir;
+                }
+                //if we're running from Bamboo the directory is different and we need to find the dll
+                var paths = Directory.GetFiles(Path.Combine(Path.Combine(dir, ".."), ".."), fileName, SearchOption.AllDirectories);
+
+                var path = Path.GetDirectoryName(paths[0]);
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+                else
+                {
+                    throw new Exception($"Could not find WebDriver Browser executable {fileName}.  It will need to be copied to path {dir} or {path} ");
+                }
             }
-            var dir = AppDomain.CurrentDomain.BaseDirectory;
-            if (File.Exists(Path.Combine(dir, fileName)))
+            catch(Exception e)
             {
-                return dir;
+                throw new Exception($"Could not find WebDriver Browser executable {browserName}.  It will need to be copied to path {AppDomain.CurrentDomain.BaseDirectory} or installed via Nuget");
+
             }
-            //if we're running from Bamboo the directory is different and we need to find the dll
-            var paths = Directory.GetFiles(Path.Combine(Path.Combine(dir, ".."), ".."), fileName, SearchOption.AllDirectories);
-            var path = Path.GetDirectoryName(paths[0]);
-            if (File.Exists(path))
-            {
-                return path;
-            }
-            else
-            {
-                throw new Exception($"Could not find WebDriver Browser executable {fileName}.  It will need to be copied to path {dir} or {path} ");
-            }
+            
 
         }
         public static void CloseAllDrivers()

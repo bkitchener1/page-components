@@ -1,11 +1,11 @@
 ﻿using AventStack.ExtentReports;
+using AventStack.ExtentReports.Gherkin.Model;
 using AventStack.ExtentReports.Reporter;
+using AventStack.ExtentReports.Reporter.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using AventStack.ExtentReports.Gherkin.Model;
 using System.Threading;
-using AventStack.ExtentReports.Reporter.Configuration;
 
 namespace PageComponents
 {
@@ -19,7 +19,7 @@ namespace PageComponents
         private static readonly object _synclock = new object();
         private static ThreadLocal<ExtentTest> _currentTest = new ThreadLocal<ExtentTest>();
         private static Dictionary<string, ExtentTest> _tests = new Dictionary<string, ExtentTest>();
-        private static ExtentReports _extentReports;
+        private static AventStack.ExtentReports.ExtentReports _extentReports;
 
         /// <summary>
         /// Gets the report directorry.  By default it should appear in the bin/debug/reports directory
@@ -41,7 +41,7 @@ namespace PageComponents
         {
             _htmlReporter = new ExtentHtmlReporter(GetReportPath());
             _htmlReporter.Config.Theme = Theme.Dark;
-            _extentReports = new ExtentReports();
+            _extentReports = new AventStack.ExtentReports.ExtentReports();
             _extentReports.AttachReporter(_htmlReporter);
         }
 

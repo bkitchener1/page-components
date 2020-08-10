@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 namespace PageComponents
 {
     /// <summary>
-    /// PageObjectList represents a collection of page objects of a specific type
+    /// PageComponentList represents a collection of page objects of a specific type
     /// Useful to be able to use page objects as a container, and enumerate them.
-    /// PageObjectList allows the collection to be queried, sorted, and filtered.
+    /// PageComponentList allows the collection to be queried, sorted, and filtered.
     /// THe By locator passed in should return a list of elements, each represents the container
     /// for an item in our list
-    /// PageObjectList<SearchResult> searchResults = new PageObjectList<SearchResult>(By.CssSelector(".containers"));
+    /// PageComponentList<SearchResult> searchResults = new PageComponentList<SearchResult>(By.CssSelector(".containers"));
     /// var oneresult = searchResults.First(x=>x.CustomerName.Text == "Joe");
     /// oneresult.CustomerLink.Click();
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PageObjectList<T> : IEnumerable<T> where T : BasePageObject
+    public class PageComponentList<T> : IEnumerable<T> where T : BaseComponent
     {
             //The containers represent the list of elements on the page that contain each page object
             private Elements containers;
 
-            public PageObjectList()
+            public PageComponentList()
             {
             }
 
@@ -35,12 +35,12 @@ namespace PageComponents
             /// locator should represent the outmost container for each row.  
             /// </summary>
             /// <param name="by"></param>
-            public PageObjectList(By by)
+            public PageComponentList(By by)
             {
                 this.containers = new Elements(by);
             }
 
-            public PageObjectList(string cssSelector)
+            public PageComponentList(string cssSelector)
             {
                 this.containers = new Elements(By.CssSelector(cssSelector));
             }
@@ -50,7 +50,7 @@ namespace PageComponents
         /// </summary>
         /// <param name="frame"></param>
         /// <param name="by"></param>
-        public PageObjectList(Frame frame, By by)
+        public PageComponentList(Frame frame, By by)
             {
                 this.containers = new Elements(frame, by);
             }
@@ -62,12 +62,14 @@ namespace PageComponents
             public IEnumerator<T> GetEnumerator()
             {
 
-
+                int i = 1;
                 foreach (var ele in this.containers)
                 {
-                    var el = Activator.CreateInstance<T>();
-                    el.container = ele;
+                    T el = Activator.CreateInstance<T>();
+                    el.Container = ele;
                     el.WrappedElement = ele.WrappedElement;
+                    el.Index = i;
+                    i++;
                     yield return el;
                 }
             }
