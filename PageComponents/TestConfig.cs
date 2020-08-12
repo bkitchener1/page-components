@@ -11,7 +11,7 @@ namespace PageComponents
     /// WebConfig stores config values from the app.config in the appropriate format.
     /// If no value has been set in the app.config uses the default setting provided here
     /// </summary>
-    public class WebConfig
+    public class TestConfig
     {
         public static int ElementTimeoutMs = GetConfigInt("ElementTimeoutMs", 10000);
         public static bool AutoLaunchBrowser = GetConfigBool("AutoLaunchBrowser", true);

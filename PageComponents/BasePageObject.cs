@@ -39,7 +39,7 @@ namespace PageComponents
 
             if (page.Domain == null)
             {
-                page.Domain = WebConfig.DefaultUrl;
+                page.Domain = TestConfig.DefaultUrl;
             }
             page.WrappedDriver.Navigate().GoToUrl(page.Domain + page.Uri);
 

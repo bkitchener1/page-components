@@ -108,7 +108,7 @@ namespace PageComponents
         //        /// </summary>
         public Element()
         {
-            this._timeoutMs = WebConfig.ElementTimeoutMs;
+            this._timeoutMs = TestConfig.ElementTimeoutMs;
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace PageComponents
         {
 
             this._by = By.CssSelector(cssSelector);
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace PageComponents
 
             this._by = By.CssSelector(cssSelector);
             this._frame = frame;
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace PageComponents
         {
 
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace PageComponents
         {
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
 
         }
 
@@ -169,7 +169,7 @@ namespace PageComponents
         {
             this._container = container;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
 
         }
 
@@ -183,7 +183,7 @@ namespace PageComponents
         {
             this._container = container;
             this._by = By.CssSelector(cssSelector);
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
 
         }
 
@@ -200,7 +200,7 @@ namespace PageComponents
             this._container = container;
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? WebConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
 
         }
 

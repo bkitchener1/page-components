@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Brian Kitchener</Authors>
+    <Company>Inertial Consulting</Company>
+    <Title>Selenium Page Components</Title>
+    <Summary>A simple selenium framework for writing page components and page objects</Summary>
+    <Description>A stable, simple selenium framework for building DRY, well organized automated tests.  Page Components are a continuation of hte page object model.  They represent small, reusable blocks of application logic that can be pieced together into larger page objects.  They essentially act as a middle layer between pages and elements.</Description>
+    <PackageProjectUrl>https://github.com/bkitchener1/page-components/</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>gpl-3.0.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/bkitchener1/page-components</RepositoryUrl>
+    <PackageTags>selenium webdriver framework webelement element</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +26,13 @@
     <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.27.0" />
     <PackageReference Include="Selenium.WebDriver.IEDriver" Version="3.150.1.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="gpl-3.0.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

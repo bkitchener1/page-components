@@ -19,28 +19,22 @@ namespace PageComponents
     /// </summary>
     public static class DriverManager
     {
-        private static ThreadLocal<IWebDriver> _webDrivers = new ThreadLocal<IWebDriver>();
-
         /// <summary>
         /// The list of webdriver instances currently stored.  Each Test has it's own instance of webdriver.
         /// This supports parallel executions of tests and multiple instances of webdriver
         /// If additional instances are needed for a test they must bne added manually
         /// </summary>
-        public static ThreadLocal<IWebDriver> WebDrivers
-        {
-            get { return _webDrivers; }
-            set { _webDrivers = value; }
-        }
+        private static ThreadLocal<IWebDriver> _webDrivers = new ThreadLocal<IWebDriver>();
 
         public static IWebDriver WebDriver
         {
             get
             {
-                return WebDrivers.Value;
+                return _webDrivers.Value;
             }
             set
             {
-                WebDrivers.Value = value;
+                _webDrivers.Value = value;
             }
         }
 
@@ -53,36 +47,33 @@ namespace PageComponents
         /// <returns></returns>
         public static IWebDriver StartDriver(string testName = null)
         {
-            IWebDriver driver;
-
-            if (WebConfig.RemoteSession)
+            if (TestConfig.RemoteSession)
             {
-                driver = StartRemoteBrowser();
+                WebDriver = StartRemoteBrowser();
             }
-            else if (WebConfig.WiniumSession)
+            else if (TestConfig.WiniumSession)
             {
-                driver = StartWiniumSession();
+                WebDriver = StartWiniumSession();
             }
             else
             {
-                driver = StartLocalDriver();
+                WebDriver = StartLocalDriver();
             }
 
             if (testName == null)
             {
                 testName = TestContext.CurrentContext.Test.Name;
             }
-            WebDrivers.Value = driver;
-            return driver;
+            return WebDriver;
 
         }
 
         public static IWebDriver StartWiniumSession()
         {
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(WebConfig.RemoteServer);
+            Uri remoteUri = new Uri(TestConfig.RemoteServer);
             DesiredCapabilities caps = new DesiredCapabilities();
-            caps.SetCapability("app", WebConfig.WiniumApp);
+            caps.SetCapability("app", TestConfig.WiniumApp);
             driver = new RemoteWebDriver(remoteUri, caps);
             return driver;
         }
@@ -90,7 +81,7 @@ namespace PageComponents
         public static IWebDriver StartRemoteBrowser()
         {
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(WebConfig.RemoteServer + "/wd/hub/");
+            Uri remoteUri = new Uri(TestConfig.RemoteServer + "/wd/hub/");
             var options = GetRemoteBrowserOptions();
             options = AddRemoteCapibilitiesFromConfig(options);
             driver = new RemoteWebDriver(remoteUri, options);
@@ -99,7 +90,7 @@ namespace PageComponents
 
         private static DriverOptions AddRemoteCapibilitiesFromConfig(DriverOptions options)
         {
-            var caps = WebConfig.RemoteCapabilities.Split(';');
+            var caps = TestConfig.RemoteCapabilities.Split(';');
             if (caps[0] == "")
             {
                 return options;
@@ -118,9 +109,9 @@ namespace PageComponents
 
         private static DriverOptions GetRemoteBrowserOptions()
         {
-            string browserName = WebConfig.BrowserName;
+            string browserName = TestConfig.BrowserName;
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(WebConfig.RemoteServer);
+            Uri remoteUri = new Uri(TestConfig.RemoteServer);
             switch (browserName.ToLower())
             {
                 case WebBrowsers.InternetExplorer:
@@ -142,7 +133,7 @@ namespace PageComponents
 
         public static IWebDriver StartLocalDriver()
         {
-            string browserName = WebConfig.BrowserName;
+            string browserName = TestConfig.BrowserName;
             IWebDriver driver = null;
             var path = GetDriverPath(browserName.ToLower());
             switch (browserName.ToLower())
@@ -167,20 +158,6 @@ namespace PageComponents
         }
 
         private static object locker = new object();
-
-        /// <summary>
-        /// Gets the current instance of webdriver based upon the current test name.
-        /// IF a new browser is needed use StartDriver() instead
-        /// </summary>
-        /// <returns></returns>
-        public static IWebDriver GetDriver()
-        {
-            lock (locker)
-            {
-                return WebDrivers.Value;
-            }
-            
-        }
 
         private static string GetDriverPath(string browserName)
         {
@@ -228,13 +205,6 @@ namespace PageComponents
             
 
         }
-        public static void CloseAllDrivers()
-        {
-            foreach (var driver in WebDrivers.Values)
-            {
-                driver.Close();
-                driver.Quit();
-            }
-        }
+
     }
 }

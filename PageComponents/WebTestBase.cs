@@ -26,7 +26,7 @@ namespace PageComponents
             }
             set
             {
-                DriverManager.WebDrivers.Value = value;
+                DriverManager.WebDriver = value;
             }
         }
         #region Test attributes
@@ -37,7 +37,7 @@ namespace PageComponents
         {
             // creates a test 
             // calling flush writes everything to the log file
-            if (WebConfig.AutoLaunchBrowser)
+            if (TestConfig.AutoLaunchBrowser)
             {
                 DriverManager.StartDriver();
                 driver.Manage().Window.Maximize();
@@ -55,7 +55,7 @@ namespace PageComponents
                     Logger.Error(TestContext.CurrentContext.Result.Message);
                     Logger.Error(TestContext.CurrentContext.Result.StackTrace);
                 }
-                if (WebConfig.AutoQuitBrowser)
+                if (TestConfig.AutoQuitBrowser)
                 {
                     driver.Close();
                     driver.Quit();
