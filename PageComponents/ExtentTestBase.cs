@@ -47,7 +47,7 @@ namespace PageComponents
         {
             
             // creates a test 
-            ExtentManager.CreateTest(this.GetType().Name + "." + TestContext.CurrentContext.Test.Name, TestContext.CurrentContext.Test.FullName);
+            ExtentManager.CreateTest(this.GetType().Name + "." + NUnit.Framework.TestContext.CurrentContext.Test.Name, NUnit.Framework.TestContext.CurrentContext.Test.FullName);
         }
 
         //Use TestCleanup to run code after each test has run
@@ -56,13 +56,13 @@ namespace PageComponents
         {
             try
             {
-                if (TestContext.CurrentContext.Result.Outcome != ResultState.Success)
+                if (NUnit.Framework.TestContext.CurrentContext.Result.Outcome != ResultState.Success)
                 {
-                    test.Fail(TestContext.CurrentContext.Result.Message,
+                    test.Fail(NUnit.Framework.TestContext.CurrentContext.Result.Message,
                         MediaEntityBuilder
                             .CreateScreenCaptureFromBase64String(driver.TakeScreenshot().AsBase64EncodedString)
                             .Build());
-                    test.Error(TestContext.CurrentContext.Result.StackTrace);
+                    test.Error(NUnit.Framework.TestContext.CurrentContext.Result.StackTrace);
                 }
 
             }

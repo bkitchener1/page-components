@@ -68,33 +68,33 @@ namespace PageComponents
 
         public Elements()
         {
-            this._timeoutMs = TestConfig.ElementTimeoutMs;
+            this._timeoutMs = TestContext.CurrentContext.TestConfig.ElementTimeoutMs;
         }
 
         public Elements(string cssSelector, int timeoutMs = -1)
         {
             this._by = By.CssSelector(cssSelector);
-            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public Elements(By by, int timeoutMs = -1)
         {
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public Elements(By by, Frame frame, int timeoutMs = -1)
         {
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public Elements(Element container, By by, int timeoutMs = -1)
         {
             this._container = container;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public Elements(Element container, By by, Frame frame, int timeoutMs = -1)
@@ -102,7 +102,7 @@ namespace PageComponents
             this._container = container;
             this._frame = frame;
             this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestConfig.ElementTimeoutMs : timeoutMs;
+            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
         }
 
         public override string ToString()

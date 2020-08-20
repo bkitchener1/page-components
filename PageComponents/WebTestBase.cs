@@ -37,7 +37,7 @@ namespace PageComponents
         {
             // creates a test 
             // calling flush writes everything to the log file
-            if (TestConfig.AutoLaunchBrowser)
+            if (TestContext.CurrentContext.TestConfig.AutoLaunchBrowser)
             {
                 DriverManager.StartDriver();
                 driver.Manage().Window.Maximize();
@@ -50,12 +50,12 @@ namespace PageComponents
         {
             try
             {
-                if(TestContext.CurrentContext.Result.Outcome != ResultState.Success)
+                if(NUnit.Framework.TestContext.CurrentContext.Result.Outcome != ResultState.Success)
                 {
-                    Logger.Error(TestContext.CurrentContext.Result.Message);
-                    Logger.Error(TestContext.CurrentContext.Result.StackTrace);
+                    Logger.Error(NUnit.Framework.TestContext.CurrentContext.Result.Message);
+                    Logger.Error(NUnit.Framework.TestContext.CurrentContext.Result.StackTrace);
                 }
-                if (TestConfig.AutoQuitBrowser)
+                if (TestContext.CurrentContext.TestConfig.AutoQuitBrowser)
                 {
                     driver.Close();
                     driver.Quit();

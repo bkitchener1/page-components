@@ -1,6 +1,6 @@
 ﻿using PageComponents;
 
-namespace PageComponentUnitTests.Pages
+namespace ExampleTests.Pages
 {
     class GoogleHomePage : BasePageObject
     {

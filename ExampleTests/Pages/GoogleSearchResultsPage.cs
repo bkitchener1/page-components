@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using PageComponents;
-using SampleTests.Components;
+using ExampleTests.Components;
 
-namespace PageComponentUnitTests.Pages
+namespace ExampleTests.Pages
 {
     class GoogleSearchResultsPage : BasePageObject
     {

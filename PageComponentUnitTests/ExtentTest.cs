@@ -1,9 +1,10 @@
 using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using PageComponents;
+using PageComponentUnitTests.Pages;
 using System;
 
-namespace SampleTests
+namespace PageComponentUnitTests
 {
     public class ExtentTest : ExtentTestBase
     {

@@ -13,16 +13,16 @@ namespace PageComponents
     /// </summary>
     public class TestConfig
     {
-        public static int ElementTimeoutMs = GetConfigInt("ElementTimeoutMs", 10000);
-        public static bool AutoLaunchBrowser = GetConfigBool("AutoLaunchBrowser", true);
-        public static bool AutoQuitBrowser = GetConfigBool("AutoQuitBrowser", true);
-        public static string DefaultUrl = GetConfigString("DefaultUrl", "");
-        public static string BrowserName = GetConfigString("BrowserName", "chrome");
-        public static bool RemoteSession = GetConfigBool("RemoteSession", false);
-        public static string RemoteServer = GetConfigString("RemoteServer", "http://127.0.0.1:4444");
-        public static string RemoteCapabilities = GetConfigString("RemoteCapabilities", "");
-        public static bool WiniumSession = GetConfigBool("WiniumSession", false);
-        public static string WiniumApp = GetConfigString("WiniumApp", "");
+        public int ElementTimeoutMs = GetConfigInt("ElementTimeoutMs", 10000);
+        public bool AutoLaunchBrowser = GetConfigBool("AutoLaunchBrowser", true);
+        public bool AutoQuitBrowser = GetConfigBool("AutoQuitBrowser", true);
+        public string DefaultUrl = GetConfigString("DefaultUrl", "");
+        public string BrowserName = GetConfigString("BrowserName", "chrome");
+        public bool RemoteSession = GetConfigBool("RemoteSession", false);
+        public string RemoteServer = GetConfigString("RemoteServer", "http://127.0.0.1:4444");
+        public string RemoteCapabilities = GetConfigString("RemoteCapabilities", "");
+        public bool WiniumSession = GetConfigBool("WiniumSession", false);
+        public string WiniumApp = GetConfigString("WiniumApp", "");
 
         private static string GetConfigString(string key, string defaultValue)
         {

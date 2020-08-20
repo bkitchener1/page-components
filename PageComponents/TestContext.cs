@@ -17,9 +17,10 @@ namespace PageComponents
         TestContext()
         {
             TestConfig = new TestConfig();
+            TestName = NUnit.Framework.TestContext.CurrentContext.Test.Name;
         }
 
-        public static TestContext SuiteContext { get; set; }
+        public NUnit.Framework.TestContext UnitTestContext => NUnit.Framework.TestContext.CurrentContext;
 
         public static TestContext CurrentContext
         {
@@ -27,20 +28,13 @@ namespace PageComponents
             {
                 if (_currentTestContext.Value == null)
                 {
-                    _currentTestContext.Value = SuiteContext.CopyToNewContext();
+                    _currentTestContext.Value = new TestContext();
                 }
                 return _currentTestContext.Value;
             }
             set => _currentTestContext.Value = value;
         }
 
-
-        public TestContext CopyToNewContext()
-        {
-            var newContext = (TestContext)MemberwiseClone();
-            newContext.TestName = NUnit.Framework.TestContext.CurrentContext.Test.FullName;
-            return newContext;
-        }
 
         public static void SaveContext<T>(string key, T obj)
         {

@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Remote;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using WebDriverManager.DriverConfigs.Impl;
 
 namespace PageComponents
 {
@@ -47,11 +49,11 @@ namespace PageComponents
         /// <returns></returns>
         public static IWebDriver StartDriver(string testName = null)
         {
-            if (TestConfig.RemoteSession)
+            if (TestContext.CurrentContext.TestConfig.RemoteSession)
             {
                 WebDriver = StartRemoteBrowser();
             }
-            else if (TestConfig.WiniumSession)
+            else if (TestContext.CurrentContext.TestConfig.WiniumSession)
             {
                 WebDriver = StartWiniumSession();
             }
@@ -62,7 +64,7 @@ namespace PageComponents
 
             if (testName == null)
             {
-                testName = TestContext.CurrentContext.Test.Name;
+                testName = NUnit.Framework.TestContext.CurrentContext.Test.Name;
             }
             return WebDriver;
 
@@ -71,9 +73,9 @@ namespace PageComponents
         public static IWebDriver StartWiniumSession()
         {
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(TestConfig.RemoteServer);
+            Uri remoteUri = new Uri(TestContext.CurrentContext.TestConfig.RemoteServer);
             DesiredCapabilities caps = new DesiredCapabilities();
-            caps.SetCapability("app", TestConfig.WiniumApp);
+            caps.SetCapability("app", TestContext.CurrentContext.TestConfig.WiniumApp);
             driver = new RemoteWebDriver(remoteUri, caps);
             return driver;
         }
@@ -81,7 +83,7 @@ namespace PageComponents
         public static IWebDriver StartRemoteBrowser()
         {
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(TestConfig.RemoteServer + "/wd/hub/");
+            Uri remoteUri = new Uri(TestContext.CurrentContext.TestConfig.RemoteServer + "/wd/hub/");
             var options = GetRemoteBrowserOptions();
             options = AddRemoteCapibilitiesFromConfig(options);
             driver = new RemoteWebDriver(remoteUri, options);
@@ -90,7 +92,7 @@ namespace PageComponents
 
         private static DriverOptions AddRemoteCapibilitiesFromConfig(DriverOptions options)
         {
-            var caps = TestConfig.RemoteCapabilities.Split(';');
+            var caps = TestContext.CurrentContext.TestConfig.RemoteCapabilities.Split(';');
             if (caps[0] == "")
             {
                 return options;
@@ -109,9 +111,9 @@ namespace PageComponents
 
         private static DriverOptions GetRemoteBrowserOptions()
         {
-            string browserName = TestConfig.BrowserName;
+            string browserName = TestContext.CurrentContext.TestConfig.BrowserName;
             IWebDriver driver = null;
-            Uri remoteUri = new Uri(TestConfig.RemoteServer);
+            Uri remoteUri = new Uri(TestContext.CurrentContext.TestConfig.RemoteServer);
             switch (browserName.ToLower())
             {
                 case WebBrowsers.InternetExplorer:
@@ -133,22 +135,30 @@ namespace PageComponents
 
         public static IWebDriver StartLocalDriver()
         {
-            string browserName = TestConfig.BrowserName;
+            string browserName = TestContext.CurrentContext.TestConfig.BrowserName;
             IWebDriver driver = null;
-            var path = GetDriverPath(browserName.ToLower());
             switch (browserName.ToLower())
             {
                 case WebBrowsers.InternetExplorer:
+                    new WebDriverManager.DriverManager().SetUpDriver(new InternetExplorerConfig());
                     InternetExplorerOptions options = new InternetExplorerOptions();
                     options.IntroduceInstabilityByIgnoringProtectedModeSettings = true;
                     options.AcceptInsecureCertificates = true;
-                    driver = new InternetExplorerDriver(path, options);
+                    driver = new InternetExplorerDriver(options);
                     break;
                 case WebBrowsers.Firefox:
-                    driver = new FirefoxDriver(path);
+                    new WebDriverManager.DriverManager().SetUpDriver(new FirefoxConfig());
+                    driver = new FirefoxDriver();
                     break;
                 case WebBrowsers.Chrome:
-                    driver = new ChromeDriver(path);
+                    new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+                    driver = new ChromeDriver();
+                    break;
+                case WebBrowsers.Edge:
+                    new WebDriverManager.DriverManager().SetUpDriver(new LegacyEdgeConfig());
+                    new WebDriverManager.DriverManager().SetUpDriver(new EdgeConfig());
+                    var pathVariable = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process);
+                    driver = new EdgeDriver();
                     break;
                 default:
                     throw new Exception($"Could not launch browser of name {browserName} please use : ie, firefox, or chrome");
@@ -158,53 +168,6 @@ namespace PageComponents
         }
 
         private static object locker = new object();
-
-        private static string GetDriverPath(string browserName)
-        {
-            try
-            {
-                string fileName = null;
-                switch (browserName)
-                {
-                    case WebBrowsers.InternetExplorer:
-                        fileName = "IEDriverServer.exe";
-                        break;
-                    case WebBrowsers.Firefox:
-                        fileName = "GeckoDriver.exe";
-                        break;
-                    case WebBrowsers.Chrome:
-                        fileName = "ChromeDriver.exe";
-                        break;
-                    default:
-                        throw new Exception("Browser not supported : " + browserName);
-                        break;
-                }
-                var dir = AppDomain.CurrentDomain.BaseDirectory;
-                if (File.Exists(Path.Combine(dir, fileName)))
-                {
-                    return dir;
-                }
-                //if we're running from Bamboo the directory is different and we need to find the dll
-                var paths = Directory.GetFiles(Path.Combine(Path.Combine(dir, ".."), ".."), fileName, SearchOption.AllDirectories);
-
-                var path = Path.GetDirectoryName(paths[0]);
-                if (File.Exists(path))
-                {
-                    return path;
-                }
-                else
-                {
-                    throw new Exception($"Could not find WebDriver Browser executable {fileName}.  It will need to be copied to path {dir} or {path} ");
-                }
-            }
-            catch(Exception e)
-            {
-                throw new Exception($"Could not find WebDriver Browser executable {browserName}.  It will need to be copied to path {AppDomain.CurrentDomain.BaseDirectory} or installed via Nuget");
-
-            }
-            
-
-        }
 
     }
 }

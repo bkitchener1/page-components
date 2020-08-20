@@ -2,17 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace PageComponents
 {
     public static class Logger
     {
-        static Logger()
-        {
-            LogMessage = new Action<string>(ConsoleLog);
-        }
 
-        private static Action<string> LogMessage { get; set; }
+
+        private static ThreadLocal<Action<string>> _logMessages = new ThreadLocal<Action<string>>();
+
+        private static Action<string> LogMessage 
+        { 
+            get
+            {
+                if(_logMessages.Value == null)
+                {
+                    _logMessages.Value = new Action<string>(ConsoleLog);
+                }
+                return _logMessages.Value;
+            }
+
+            set
+            {
+                _logMessages.Value = value;
+            }
+
+        }
 
         public static void SetLogger(Action<string> logFunction)
         {

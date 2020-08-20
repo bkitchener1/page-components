@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using PageComponents;
+using ExampleTests.Pages;
 
-namespace SampleTests
+namespace ExampleTests
 {
+    [Parallelizable(ParallelScope.All)]
     public class GoogleSearchTests : WebTestBase
     {
 

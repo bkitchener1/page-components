@@ -1,16 +1,19 @@
+using ExampleTests.Pages;
 using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using PageComponents;
 using System;
+using WebDriverManager.DriverConfigs.Impl;
 
-namespace SampleTests
+namespace ExampleTests
 {
     public class ExternalDriverTest 
     {
         [SetUp]
         public void SetupDriver()
         {
-            DriverManager.WebDriver = new ChromeDriver(AppDomain.CurrentDomain.BaseDirectory);
+            new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+            DriverManager.WebDriver = new ChromeDriver();
         }
 
         [TearDown]

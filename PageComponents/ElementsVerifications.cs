@@ -20,7 +20,7 @@ namespace PageComponents
     {
         private Elements _elements;
         private bool _isTrue;
-        private int _timeoutMs = TestConfig.ElementTimeoutMs;
+        private int _timeoutMs = TestContext.CurrentContext.TestConfig.ElementTimeoutMs;
         private WebDriverWait _wait;
 
         public ElementsVerifications(Elements elements)
