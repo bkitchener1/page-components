@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -27,51 +28,15 @@ namespace PageComponents
     /// </summary>
     public class Element : IWrapsElement, IWrapsDriver
     {
-        protected By _by;
-        protected Frame _frame;
-        protected Element _container;
-        protected int _timeoutMs;
-        protected IWebElement _webelement;
-        protected IWebDriver _driver;
-        protected bool _findHidden = false;
-        public int Index = 0;
-
-        /// <summary>
-        /// The locator associated with this element
-        /// </summary>
-        public By By
-        {
-            get { return _by; }
-            set { _by = value; }
-        }
-
-        /// <summary>
-        /// An iframe which the element lives inside.  Frame will be automatically selected prior to finding
-        /// </summary>
-        public Frame Frame
-        {
-            get { return _frame; }
-        }
-
-        /// <summary>
-        /// The root container element.  This element is used for all FindElement() searches, limiting
-        /// search scope to descendents.  This helps if there are multiple elements on the page,
-        /// or to speed up finding elements
-        /// </summary>
-        public Element Container
-        {
-            get { return _container; }
-            set { _container = value; }
-        }
-
-        /// <summary>
-        /// The time in milliseconds the element will be searched for before failing
-        /// </summary>
-        public int TimeoutMs
-        {
-            get { return _timeoutMs; }
-            set { _timeoutMs = value; }
-        }
+        public By By { get; set; }
+        public Frame Frame { get; set; }
+        public Element Container { get; set; }
+        protected string Name { get; set; }
+        public int TimeoutMs { get; set; }
+        protected IWebElement WebElement { get; set; }
+        protected IWebDriver Driver { get; set; }
+        public bool FindHidden { get; set; } = false;
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The IWebDriver instance associated with this element
@@ -79,8 +44,8 @@ namespace PageComponents
         /// </summary>
         public IWebDriver WrappedDriver
         {
-            get { return _driver != null ? _driver : DriverManager.WebDriver; }
-            set { _driver = value; }
+            get { return Driver != null ? Driver : DriverManager.WebDriver; }
+            set { Driver = value; }
         }
 
         /// <summary>
@@ -88,27 +53,18 @@ namespace PageComponents
         /// </summary>
         public IWebElement WrappedElement
         {
-            get { return _webelement; }
-            set { _webelement = value; }
+            get { return WebElement; }
+            set { WebElement = value; }
         }
 
-        /// <summary>
-        /// Determines whether or not hidden elements should be found.
-        /// By default, the Element class will exclude non-visible elements
-        /// To find hidden elements, set this to be false for the element.
-        /// </summary>
-        public bool FindHidden
-        {
-            get { return _findHidden; }
-            set { _findHidden = value; }
-        }
 
         //        /// <summary>
         //        /// Instantiates an element without a by locator 
         //        /// </summary>
         public Element()
         {
-            this._timeoutMs = TestContext.CurrentContext.TestConfig.ElementTimeoutMs;
+            this.TimeoutMs = TestContext.CurrentContext.TestConfig.ElementTimeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -118,8 +74,9 @@ namespace PageComponents
         public Element(string cssSelector, int timeoutMs = -1)
         {
 
-            this._by = By.CssSelector(cssSelector);
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.By = By.CssSelector(cssSelector);
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -129,9 +86,10 @@ namespace PageComponents
         public Element(string cssSelector, Frame frame, int timeoutMs = -1)
         {
 
-            this._by = By.CssSelector(cssSelector);
-            this._frame = frame;
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.By = By.CssSelector(cssSelector);
+            this.Frame = frame;
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -141,8 +99,9 @@ namespace PageComponents
         public Element(By by, int timeoutMs = -1)
         {
 
-            this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.By = by;
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -153,10 +112,10 @@ namespace PageComponents
         /// <param name="by"></param>
         public Element(By by, Frame frame, int timeoutMs = -1)
         {
-            this._frame = frame;
-            this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
-
+            this.Frame = frame;
+            this.By = by;
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -167,10 +126,10 @@ namespace PageComponents
         /// <param name="by"></param>
         public Element(Element container, By by, int timeoutMs = -1)
         {
-            this._container = container;
-            this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
-
+            this.Container = container;
+            this.By = by;
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         /// <summary>
@@ -181,10 +140,10 @@ namespace PageComponents
         /// <param name="by"></param>
         public Element(Element container, string cssSelector, int timeoutMs = -1)
         {
-            this._container = container;
-            this._by = By.CssSelector(cssSelector);
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
-
+            this.Container = container;
+            this.By = By.CssSelector(cssSelector);
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
 
@@ -197,18 +156,34 @@ namespace PageComponents
         /// <param name="by"></param>
         public Element(Element container, By by, Frame frame, int timeoutMs = -1)
         {
-            this._container = container;
-            this._frame = frame;
-            this._by = by;
-            this._timeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
-
+            this.Container = container;
+            this.Frame = frame;
+            this.By = by;
+            this.TimeoutMs = timeoutMs == -1 ? TestContext.CurrentContext.TestConfig.ElementTimeoutMs : timeoutMs;
+            this.Name = GetNameFromStackTrace();
         }
 
         public Element(IWebElement webElement, By by, int index)
         {
-            this._webelement = webElement;
-            this._by = by;
+            this.WebElement = webElement;
+            this.By = by;
             this.Index = index;
+            this.Name = GetNameFromStackTrace();
+        }
+
+        private string GetNameFromStackTrace()
+        {
+            StackTrace stackTrace = new StackTrace();
+            foreach (var frame in stackTrace.GetFrames())
+            {
+                var type = frame.GetMethod().ReflectedType;
+                var name = frame.GetMethod().Name;
+                if (name != "Element" && (type.IsSubclassOf(typeof(BaseComponent)) || type.IsSubclassOf(typeof(PageComponentList<>)) || type.IsSubclassOf(typeof(BasePageObject))))
+                {
+                    return $"{type.Name}.{name.Replace("get_", "")}";
+                }
+            }
+            return "Element";
         }
 
         /// <summary>
@@ -217,26 +192,30 @@ namespace PageComponents
         /// <returns></returns>
         public override string ToString()
         {
-            if (_container != null)
+            if (Container != null)
             {
-                return $"Element '{_by}' with container '{_container}'";
+                return $"{Name} '{By}' with container '{Container}'";
             }
             if (Index != 0)
             {
                 //Want the log to be clear that this comes from a list
-                return $"Element '{_by}' [{Index}]";
+                return $"{Name} '{By}' [{Index}]";
 
             }
-            return $"Element '{_by}'";
+            return $"{Name} '{By}'";
         }
 
         public IWebElement WaitForMe()
         {
-            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(_timeoutMs));
+            var wait = new WebDriverWait(WrappedDriver, TimeSpan.FromMilliseconds(TimeoutMs));
             wait.Message = $"{this} was not found";
             wait.Until(driver => !FindMe().IsStale());
-             _webelement.Highlight();
-            return _webelement;
+            if (TestContext.CurrentContext.TestConfig.HighlightElements)
+            {
+                WebElement.Highlight();
+            }
+             
+            return WebElement;
         }
 
         /// <summary>
@@ -249,30 +228,31 @@ namespace PageComponents
         {
 
             //wait for all ajax requests to finish
-            WrappedDriver.WaitForAjax(_timeoutMs);
+            WrappedDriver.WaitForAjax(TimeoutMs);
 
             //look for a non-null reference in the cache            
-            if (_webelement == null)
+            if (WebElement == null)
             {
-                _webelement = WebElementCache.GetCachedElement(this.ToString(), Index);
+                WebElement = WebElementCache.GetCachedElement(this.ToString(), Index);
             }
 
             //If the element was already found, and has not gone stale, return the previously found IWebElement
 
             if (IsStale())
             {
+                var stopwatch = Stopwatch.StartNew();
                 WrappedDriver.SwitchTo().DefaultContent();
                 //if the container is not null, use it as the root element (search in descendents)
-                if (_container != null)
+                if (Container != null)
                 {
                     //find the root element using the container's findMe
-                    var root = _container.FindMe();
+                    var root = Container.FindMe();
                     //select an iframe if necessary
-                    if (_frame != null)
+                    if (Frame != null)
                     {
-                        Logger.Log($"Select frame {_frame}");
+                        Logger.Log($"Select frame {Frame}");
 
-                        WrappedDriver.SwitchTo().Frame(_frame.WaitForMe());
+                        WrappedDriver.SwitchTo().Frame(Frame.WaitForMe());
                     }
 
                     //if FindHidden is false, only find visible elements
@@ -280,49 +260,49 @@ namespace PageComponents
                     {
                         Logger.Log($"Finding visible {this}");
 
-                        _webelement = root.FindVisibleElement(_by);
+                        WebElement = root.FindVisibleElement(By);
                     }
                     else
                     {
                         Logger.Log($"Finding {this}");
 
                         //find any element, even if its hidden
-                        _webelement = root.FindElement(_by);
+                        WebElement = root.FindElement(By);
                     }
                 }
                 else
                 {
                     //select the iframe if appropriate
-                    if (_frame != null)
+                    if (Frame != null)
                     {
-                        Logger.Log($"Selecting frame {_frame}");
+                        Logger.Log($"Selecting frame {Frame}");
 
-                        WrappedDriver.SwitchTo().Frame(_frame.WaitForMe());
+                        WrappedDriver.SwitchTo().Frame(Frame.WaitForMe());
                     }
                     //find hidden elements if appropriate
                     if (!FindHidden)
                     {
                         Logger.Log($"Finding visible {this}");
 
-                        _webelement = WrappedDriver.FindVisibleElement(_by);
+                        WebElement = WrappedDriver.FindVisibleElement(By);
                     }
                     //find any element including hidden ones
                     else
                     {
                         Logger.Log($"Finding {this}");
 
-                        _webelement = WrappedDriver.FindElement(_by);
+                        WebElement = WrappedDriver.FindElement(By);
                     }
 
 
                 }
+                stopwatch.Stop();
+                Logger.Log($"{this} found after {stopwatch.ElapsedMilliseconds} ms");
                 //save the found element to the cache
-                WebElementCache.SaveElementToCache(_webelement, this.ToString(), Index);
+                WebElementCache.SaveElementToCache(WebElement, this.ToString(), Index);
             }
 
-            //highlight the element so the user can see what element was found
-            //            _webelement.Highlight();
-            return _webelement;
+            return WebElement;
         }
 
 
@@ -334,13 +314,13 @@ namespace PageComponents
         {
             try
             {
-                if (_webelement == null)
+                if (WebElement == null)
                 {
                     return true;
                 }
 
                 //if the element reference is good, this will pass
-                var enabled = _webelement.Enabled;
+                var enabled = WebElement.Enabled;
                 return false;
             }
             catch (Exception e)
@@ -396,7 +376,7 @@ namespace PageComponents
                 try
                 {
                     FindMe();
-                    return _webelement != null;
+                    return WebElement != null;
                 }
                 catch (Exception e)
                 {

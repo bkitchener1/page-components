@@ -28,17 +28,17 @@ namespace PageComponents
         /// <returns></returns>
         public override string ToString()
         {
-            if (_container != null)
+            if (Container != null)
             {
-                return $"Frame '{_by}' with parent '{_container}'";
+                return $"Frame '{By}' with parent '{Container}'";
             }
             if (Index != 0)
             {
                 //Want the log to be clear that this comes from a list
-                return $"Frame '{_by}' [{Index + 1}]";
+                return $"Frame '{By}' [{Index + 1}]";
 
             }
-            return $"Frame '{_by}'";
+            return $"Frame '{By}'";
         }
     }
 }

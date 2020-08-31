@@ -3,6 +3,7 @@ using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenQA.Selenium.Internal;
 
@@ -140,7 +141,7 @@ namespace PageComponents
             _webElements = WebElementsCache.GetCachedElements(this.ToString());
             if (IsStale())
             {
-
+                var stopwatch = Stopwatch.StartNew();
                 if (_container != null)
                 {
                     var root = _container.FindMe();
@@ -186,12 +187,17 @@ namespace PageComponents
                 }
                 foreach(var ele in _webElements)
                 {
-                    ele.Highlight(50, "red");
+                    if (TestContext.CurrentContext.TestConfig.HighlightElements)
+                    {
+                        ele.Highlight(50, "red");
+                    }
                 }
+
+
+                stopwatch.Stop();
+                Logger.Log($"Found {_webElements.Count()} Elements {_by} after {stopwatch.ElapsedMilliseconds} ms");
+
             }
-
-
-             Logger.Log($"Found {_webElements.Count()} Elements {_by}");
 
             _elements = new List<Element>();
             int i = 1;

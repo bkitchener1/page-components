@@ -65,21 +65,21 @@ namespace PageComponents
         /// <returns></returns>
         public override string ToString()
         {
-            if(_by == null && Container != null)
+            if(By == null && Container != null)
             {
-                return _container.ToString();
+                return Container.ToString();
             }
-            if (_by != null && _container != null)
+            if (By != null && Container != null)
             {
-                return $"Element '{_by}' with parent '{_container}'";
+                return $"Component '{By}' with parent '{Container}'";
             }
             if (Index != 0)
             {
                 //Want the log to be clear that this comes from a list
-                return $"Element '{_by}' [{Index}]";
+                return $"Component '{By}' [{Index}]";
 
             }
-            return $"Element '{_by}'";
+            return $"Component '{By}'";
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace PageComponents
         /// <returns></returns>
         public Element Element(string cssSelector, Frame frame)
         {
-            return new Element(this,  By.CssSelector(cssSelector), frame);
+            return new Element(this, OpenQA.Selenium.By.CssSelector(cssSelector), frame);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace PageComponents
         /// <returns></returns>
         public Elements Elements(string cssSelector)
         {
-            return new Elements(this, By.CssSelector(cssSelector));
+            return new Elements(this, OpenQA.Selenium.By.CssSelector(cssSelector));
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace PageComponents
         /// <returns></returns>
         public Elements Elements(string cssSelector, Frame frame)
         {
-            return new Elements(this, By.CssSelector(cssSelector), frame);
+            return new Elements(this, OpenQA.Selenium.By.CssSelector(cssSelector), frame);
         }
 
         /// <summary>

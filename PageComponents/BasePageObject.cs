@@ -11,7 +11,7 @@ namespace PageComponents
     /// BasePageObject is an abstract class to be inherited by all page objects
     /// It provides a logger, root uri, and methods to open and instantiate the page object
     /// </summary>
-    public abstract class BasePageObject : Element
+    public abstract class BasePageObject 
     {
         public string Uri;
         public string Domain;
@@ -41,7 +41,7 @@ namespace PageComponents
             {
                 page.Domain = TestContext.CurrentContext.TestConfig.DefaultUrl;
             }
-            page.WrappedDriver.Navigate().GoToUrl(page.Domain + page.Uri);
+            DriverManager.WebDriver.Navigate().GoToUrl(page.Domain + page.Uri);
 
             return page;
         }

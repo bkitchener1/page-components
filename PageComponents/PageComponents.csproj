@@ -15,9 +15,13 @@
     <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/bkitchener1/page-components</RepositoryUrl>
     <PackageTags>selenium webdriver framework webelement element</PackageTags>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="1.4.0" />
     <PackageReference Include="ExtentReports.Core" Version="1.0.3" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="Selenium.Support" Version="3.141.0" />

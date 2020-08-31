@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,56 +14,66 @@ namespace PageComponents
     /// </summary>
     public class TestConfig
     {
-        public int ElementTimeoutMs = GetConfigInt("ElementTimeoutMs", 10000);
-        public bool AutoLaunchBrowser = GetConfigBool("AutoLaunchBrowser", true);
-        public bool AutoQuitBrowser = GetConfigBool("AutoQuitBrowser", true);
-        public string DefaultUrl = GetConfigString("DefaultUrl", "");
-        public string BrowserName = GetConfigString("BrowserName", "chrome");
-        public bool RemoteSession = GetConfigBool("RemoteSession", false);
-        public string RemoteServer = GetConfigString("RemoteServer", "http://127.0.0.1:4444");
-        public string RemoteCapabilities = GetConfigString("RemoteCapabilities", "");
-        public bool WiniumSession = GetConfigBool("WiniumSession", false);
-        public string WiniumApp = GetConfigString("WiniumApp", "");
+        private static bool EnvFileLoaded = false;
+        public int ElementTimeoutMs { get; set; }
+        public bool AutoLaunchBrowser { get; set; }
+        public bool AutoQuitBrowser { get; set; }
+        public string DefaultUrl { get; set; }
+        public string BrowserName { get; set; }
+        public string Browser2Name { get; set; }
+        public string Browser3Name { get; set; }
+        public int BrowserHeight { get; set; }
+        public int BrowserWidth { get; set; }
+        public bool HighlightElements { get; set; }
+        public bool HeadlessBrowser { get; set; }
+        public bool RemoteSession { get; set; }
+        public string RemoteServer { get; set; }
+        public string RemoteCapabilities { get; set; }
+        public bool WiniumSession { get; set; }
+        public string WiniumApp { get; set; }
 
-        private static string GetConfigString(string key, string defaultValue)
+        public static string EnvFilePath
         {
-            string value = ConfigurationManager.AppSettings[key];
-            if (value != null)
+            get
             {
-                return value;
-            }
-            else
-            {
-                return defaultValue;
+                var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                for (var i = 0; i < 5 && dir.FullName.Contains("\\bin"); i++)
+                    dir = Directory.GetParent(dir.FullName);
+                return Path.Combine(dir.ToString(), ".env");
             }
         }
 
-        private static bool GetConfigBool(string key, bool defaultValue)
+        public static void LoadEnvFile()
         {
-            string value = ConfigurationManager.AppSettings[key];
-            if (value != null)
+            if (File.Exists(EnvFilePath) && !EnvFileLoaded)
             {
-                var result = Boolean.Parse(value.ToLower());
-                return result;
-            }
-            else
-            {
-                return defaultValue;
+                DotNetEnv.Env.Load(EnvFilePath, new DotNetEnv.Env.LoadOptions(clobberExistingVars: false));
+                EnvFileLoaded = true;
             }
         }
 
 
-        private static int GetConfigInt(string key, int defaultValue)
+        public TestConfig()
         {
-            string value = ConfigurationManager.AppSettings[key];
-            if (value != null)
-            {
-                return Int32.Parse(value);
-            }
-            else
-            {
-                return defaultValue;
-            }  
-        }
+            LoadEnvFile();
+
+            ElementTimeoutMs = DotNetEnv.Env.GetInt("ElementTimeoutMs", 10000);
+            AutoLaunchBrowser = DotNetEnv.Env.GetBool("AutoLaunchBrowser", true);
+            AutoQuitBrowser = DotNetEnv.Env.GetBool("AutoQuitBrowser", true);
+            DefaultUrl = DotNetEnv.Env.GetString("DefaultUrl", "");
+            BrowserName = DotNetEnv.Env.GetString("BrowserName", "chrome");
+            Browser2Name = DotNetEnv.Env.GetString("Browser2Name", null);
+            Browser3Name = DotNetEnv.Env.GetString("Browser3Name", null);
+            HighlightElements = DotNetEnv.Env.GetBool("HighlightElements", true);
+            BrowserWidth = DotNetEnv.Env.GetInt("BrowserWidth", 1680);
+            BrowserHeight = DotNetEnv.Env.GetInt("BrowserHeight", 1020);
+            HeadlessBrowser = DotNetEnv.Env.GetBool("HeadlessBrowser", false);
+            RemoteSession = DotNetEnv.Env.GetBool("RemoteSession", false);
+            RemoteServer = DotNetEnv.Env.GetString("RemoteServer", "http://127.0.0.1:4444");
+            RemoteCapabilities = DotNetEnv.Env.GetString("RemoteCapabilities", "");
+            WiniumSession = DotNetEnv.Env.GetBool("WiniumSession", false);
+            WiniumApp = DotNetEnv.Env.GetString("WiniumApp", "");
+    }
+
     }
 }

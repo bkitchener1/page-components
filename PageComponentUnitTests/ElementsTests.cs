@@ -30,6 +30,19 @@ namespace PageComponentUnitTests
             }
         }
 
+        public class TestPage : BasePageObject
+        {
+            public Element TestElement => new Element(".class");
+        }
+
+        [Test]
+        public void TestElementName()
+        {
+            var page = new TestPage();
+            var ele = page.TestElement;
+            Assert.AreEqual("TestPage.TestElement 'By.CssSelector: .class'", ele.ToString());
+        }
+
         [Test]
         public void TestElementsGoStale()
         {
