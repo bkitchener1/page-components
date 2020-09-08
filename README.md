@@ -45,8 +45,10 @@ public class LoginPage : PageComponent{
 }
 ```
 
-### Creating Components
+### Creating a Component
 Smaller reusable components can be built using the same base PageComponent abstract class, and can be included as part of a larger page object
+Components act as a page object with a root element.  They are instantiated with a locator, and elements use the component as the root node for all searches.
+This helps to minimize search context when multiple elements are present that match a locator
 ```cs
 public class HeaderComponent : PageComponent {
   public Element LogOutLink => new Element(this, By.CssSelector(".logout"));
@@ -61,3 +63,38 @@ public class HomePage : PageComponent {
    public Header = new HeaderComponent(By.CssSelector(".header"));
 }
 ```
+
+### PageComponentLists
+Many times components are repeated on a page numerous times.  This can be a row of a table, or a panel displayed in a grid.  
+In this case the PageComponentList class can be used to build a List of components.  The PageComponentList is instantiated with
+a selector that returns the multiple elements on a page.  Each iteration of the component uses one of those elements as the root element,
+and all searches will be inside of that element.  
+
+For example, the google results page.  When a user searches for some text, the results page is displayed.  A GoogleSearchResult is built representing a single google result
+in the list, containing the search link, title, and text.  
+
+The list of google results are represented by building PageComponentList, with a locator that returns the root element of each result in the list.  We can now iterate through
+the collection, or use LINQ to query the collection.  This allows me to avoid having to use static locators using an index (such as an xpath expression), or build complicated 
+locators that reference multiple elements on the page.  I can now easily click the link of a search result containing specific text.
+```cs
+public class GoogleSearchResult : BaseComponent
+{
+    public Element ResultLink => this.Element("a>div");
+    public Element ResultText => this.Element(".st");
+    public Element ResultTitle => this.Element("a>h3");
+
+}
+
+public class GoogleSearchResultsPage : BasePageObject
+{
+    public PageComponentList<GoogleSearchResult> SearchResults = new PageComponentList<GoogleSearchResult>(".g");
+
+    public void ClickLinkWithText(string searchText)
+    {
+        var result = SearchResults.First(x => x.ResultText.Text.Contains(searchText));
+            result.ResultLink.Click();
+    }
+}
+```
+
+
