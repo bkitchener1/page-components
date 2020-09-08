@@ -49,9 +49,12 @@ public class LoginPage : PageComponent{
 Smaller reusable components can be built using the same base PageComponent abstract class, and can be included as part of a larger page object
 Components act as a page object with a root element.  They are instantiated with a locator, and elements use the component as the root node for all searches.
 This helps to minimize search context when multiple elements are present that match a locator
+
+When instantiating an Element inside a component, the component must be passed into the element as a root element.  The component can be passed into the Element constructor using the "this" keyword (new Element(this, By.CssSelector(".class")), or the Element can be instantiated using a function in the component "this.Element(By.CssSelector(".class")"
 ```cs
 public class HeaderComponent : PageComponent {
   public Element LogOutLink => new Element(this, By.CssSelector(".logout"));
+  public Element ProfileLink => this.Element(By.CssSelector(".profile"));
   
   public LoginPage LogOut() {
     LogOutLink.Click();
