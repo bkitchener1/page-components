@@ -1,7 +1,7 @@
 # page-components
 
 ## Beyond Page Objects
-Page objects are a great way to build robust reusable automated tests.  However many times we need a way to build smaller, more modular, and reusable components on a page.  This is how page-components was born!
+Page objects are a great way to build robust reusable automated tests.  However many times we need a way to build smaller, more modular, and reusable components on a page.  This is how page-components was born!  Page Components are a hybrid between a page object and an element...a page object that has an element as a root container.  All elements in  page component use the root element for searches, allowing us to use simple locators.  
 
 ## Overview
 
