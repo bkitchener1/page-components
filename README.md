@@ -80,18 +80,24 @@ The list of google results are represented by building PageComponentList, with a
 the collection, or use LINQ to query the collection.  This allows me to avoid having to use static locators using an index (such as an xpath expression), or build complicated 
 locators that reference multiple elements on the page.  I can now easily click the link of a search result containing specific text.
 ```cs
+//The GoogleSearchResult component represents a single google search result item on the google results page
 public class GoogleSearchResult : BaseComponent
 {
+    //Each Element is instantiated using "this" to show that these elements are descendents of the component
     public Element ResultLink => this.Element("a>div");
     public Element ResultText => this.Element(".st");
     public Element ResultTitle => this.Element("a>h3");
 
 }
 
+//The GoogleSearchResultsPage represents the entire google search results page
 public class GoogleSearchResultsPage : BasePageObject
 {
+    //The List of google search results.  Each item in the list will return one GoogleSearchResult found using the selector
     public PageComponentList<GoogleSearchResult> SearchResults = new PageComponentList<GoogleSearchResult>(".g");
 
+    //We can easily query the list of search results using LINQ to find relative elements.  IN this case I want to click on the 
+    //search results link for a result that contains specific text.  
     public void ClickLinkWithText(string searchText)
     {
         var result = SearchResults.First(x => x.ResultText.Text.Contains(searchText));
